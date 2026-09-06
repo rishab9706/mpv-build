@@ -2,6 +2,35 @@
 set -e
 export LC_ALL=C
 
+if grep -Fxq -- "-Dorender=enabled" "mpv_options" 2>/dev/null; then
+    patch_count=0
+    for p in orender-patch/patches-master/*.patch; do
+        if [ -e "$p" ]; then
+            patch_count=$((patch_count + 1))
+        fi
+    done
+
+    if [ "$patch_count" -eq 0 ]; then
+        echo "!! no patches in patches-master"
+        exit 1
+    fi
+
+    echo ">> applying $patch_count patch(es)"
+    for p in orender-patch/patches-master/*.patch; do
+        if [ -e "$p" ]; then
+            echo "   - $(basename "$p")"
+            git -C mpv apply --3way "../$p"
+        fi
+    done
+
+    revert_patches() {
+        echo ">> reverting patches..."
+        git -C mpv reset --hard HEAD
+        git -C mpv clean -fd
+    }
+    trap revert_patches EXIT
+fi
+
 #scripts/fribidi-config
 #scripts/fribidi-build "$@"
 scripts/libplacebo-config

@@ -17,11 +17,17 @@ do_clone()
 
 do_clone_all()
 {
-    do_clone "ffmpeg"     "https://github.com/FFmpeg/FFmpeg.git"
-    #do_clone "fribidi"    "http://anongit.freedesktop.org/git/fribidi/fribidi.git"
-    do_clone "libass"     "https://github.com/libass/libass.git"
-    do_clone "libplacebo" "https://github.com/haasn/libplacebo.git"
-    do_clone "mpv"        "https://github.com/mpv-player/mpv.git"
+    do_clone "ffmpeg"           "https://github.com/FFmpeg/FFmpeg.git"
+    #do_clone "fribidi"         "http://anongit.freedesktop.org/git/fribidi/fribidi.git"
+    do_clone "libass"           "https://github.com/libass/libass.git"
+    do_clone "libplacebo"       "https://github.com/haasn/libplacebo.git"
+    do_clone "mpv"              "https://github.com/mpv-player/mpv.git"
+    if [ -d "orender-patch" ]; then
+        git -C orender-patch pull
+    else
+        git clone --depth 1 --filter=blob:none --sparse https://github.com/mgth/mpv-omniphony.git orender-patch
+        git -C orender-patch sparse-checkout set patches-master
+    fi
 }
 
 do_gitmaster()
@@ -82,6 +88,8 @@ checkout()
         *)       >&2 printf "%s\n" "Error: Don't know how to checkout '$branch'"
                  return 1
     esac
+    git submodule update --init
+
 }
 
 # fallback targets: release/master/@foo if no config file

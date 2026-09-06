@@ -3,6 +3,7 @@
 /libass
 /libplacebo
 /mpv
+/orender-patch
 /build_libs
 /ffmpeg_build
 *.deb
